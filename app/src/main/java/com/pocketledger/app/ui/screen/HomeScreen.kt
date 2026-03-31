@@ -1,13 +1,11 @@
-package com.pocketledger.app.ui.screen
+﻿package com.pocketledger.app.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,9 +26,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 24.dp),
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         Text(
@@ -41,15 +37,15 @@ fun HomeScreen(
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
+            shape = MaterialTheme.shapes.large,
         ) {
             Column(
                 modifier = Modifier
                     .background(
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                Color(0xFF4A3AC2),
-                                Color(0xFF2B1E73),
+                                Color(0xFF5B4DDE),
+                                Color(0xFF2C226E),
                             ),
                         ),
                     )
@@ -74,15 +70,27 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    SummaryItem(
-                        label = "今日已花",
-                        value = uiState.todaySpent,
-                    )
-                    SummaryItem(
-                        label = "本月总支出",
-                        value = uiState.monthExpense,
-                    )
+                    SummaryItem(label = "今日已花", value = uiState.todaySpent)
+                    SummaryItem(label = "本月总支出", value = uiState.monthExpense)
                 }
+            }
+        }
+
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = "快速记账",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = "点击底部中央的加号按钮，立即进入“记一笔”页面。记录页现在只负责查看历史账单。",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
 
@@ -97,7 +105,7 @@ fun HomeScreen(
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = "这里将用于展示近期账单、预算提醒和快捷操作。当前为页面骨架占位。",
+                    text = "这里后续可以接入近期账单、预算提醒、固定支出和消费趋势分析。当前先保留为高质量骨架页面。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -125,4 +133,3 @@ private fun SummaryItem(
         )
     }
 }
-

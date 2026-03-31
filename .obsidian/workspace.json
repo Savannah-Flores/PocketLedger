@@ -6,6 +6,7 @@
       {
         "id": "56658edf823d6c83",
         "type": "tabs",
+        "dimension": 85.33724340175954,
         "children": [
           {
             "id": "53591580e863cc7f",
@@ -19,7 +20,31 @@
               },
               "icon": "lucide-file",
               "title": "codex prompt"
-            }
+            },
+            "group": "997bfed6dc506a41"
+          }
+        ]
+      },
+      {
+        "id": "8ca09cee327a5ac8",
+        "type": "tabs",
+        "dimension": 14.66275659824047,
+        "children": [
+          {
+            "id": "35120f18e49000d2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "codex prompt.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "codex prompt 的大纲"
+            },
+            "group": "997bfed6dc506a41"
           }
         ]
       }
@@ -185,17 +210,17 @@
   },
   "active": "53591580e863cc7f",
   "lastOpenFiles": [
-    "app/build/intermediates/apk_ide_redirect_file/debug/createDebugApkListingFileRedirect/redirect.txt",
-    "app/build/intermediates/apk_ide_redirect_file/debug/createDebugApkListingFileRedirect",
-    "app/build/intermediates/apk_ide_redirect_file/debug",
-    "app/build/intermediates/apk_ide_redirect_file",
-    "app/build/intermediates/apk/debug/output-metadata.json",
-    "app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources",
-    "app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/javaResources0",
-    "app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt",
-    "app/build/intermediates/apk/debug/app-debug.apk",
-    "app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache",
-    "app/build/intermediates/incremental/packageDebug/tmp/debug",
+    "app/build/intermediates/java_res/debug/processDebugJavaRes/out/com/pocketledger/app/utils",
+    "app/build/intermediates/java_res/debug/processDebugJavaRes/out/com/pocketledger/app/ui/model",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/RecordScreenKt$RecordScreen$lambda$2$lambda$1$$inlined$items$default$1.dex",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/ScreenScaffoldKt.dex",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/SettingsScreenKt.dex",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/ScreenScaffoldKt$PlaceholderScreen$1$1.dex",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/SavingsScreenKt.dex",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/RecordScreenKt$RecordScreen$lambda$2$lambda$1$$inlined$items$default$3.dex",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/RecordScreenKt.dex",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/RecordScreenKt$RecordScreen$lambda$2$lambda$1$$inlined$items$default$4.dex",
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/ui/screen/RecordScreenKt$RecordScreen$lambda$2$lambda$1$$inlined$items$default$2.dex",
     "codex prompt.md"
   ]
 }

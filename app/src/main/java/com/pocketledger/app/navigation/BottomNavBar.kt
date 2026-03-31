@@ -1,4 +1,4 @@
-package com.pocketledger.app.navigation
+﻿package com.pocketledger.app.navigation
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -18,7 +18,7 @@ fun BottomNavBar(
                 onClick = { onItemSelected(destination.route) },
                 icon = {
                     Icon(
-                        imageVector = destination.icon,
+                        imageVector = checkNotNull(destination.icon),
                         contentDescription = destination.label,
                     )
                 },
@@ -27,4 +27,3 @@ fun BottomNavBar(
         }
     }
 }
-
