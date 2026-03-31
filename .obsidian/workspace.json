@@ -1,0 +1,201 @@
+{
+  "main": {
+    "id": "1acb95b9827351d5",
+    "type": "split",
+    "children": [
+      {
+        "id": "56658edf823d6c83",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "53591580e863cc7f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "codex prompt.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "codex prompt"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6a1b544e364842dc",
+    "type": "split",
+    "children": [
+      {
+        "id": "515acbc7ed7c8fa9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bbfcdafb4f00eee6",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "ac5ea63563c193c4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "1efe75585c186e75",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "c3431e3f923ba65a",
+    "type": "split",
+    "children": [
+      {
+        "id": "16e1d24e03f5d981",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3bbc79c1e68eed40",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "codex prompt.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "codex prompt 的反向链接列表"
+            }
+          },
+          {
+            "id": "df0f29feca565efe",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "codex prompt.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "codex prompt 的出链列表"
+            }
+          },
+          {
+            "id": "0a230011a8d216d2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "81c704db6d511228",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "79925cf2ee226457",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "codex prompt.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "codex prompt 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "53591580e863cc7f",
+  "lastOpenFiles": [
+    "app/build/intermediates/apk_ide_redirect_file/debug/createDebugApkListingFileRedirect/redirect.txt",
+    "app/build/intermediates/apk_ide_redirect_file/debug/createDebugApkListingFileRedirect",
+    "app/build/intermediates/apk_ide_redirect_file/debug",
+    "app/build/intermediates/apk_ide_redirect_file",
+    "app/build/intermediates/apk/debug/output-metadata.json",
+    "app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources",
+    "app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/javaResources0",
+    "app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt",
+    "app/build/intermediates/apk/debug/app-debug.apk",
+    "app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache",
+    "app/build/intermediates/incremental/packageDebug/tmp/debug",
+    "codex prompt.md"
+  ]
+}
