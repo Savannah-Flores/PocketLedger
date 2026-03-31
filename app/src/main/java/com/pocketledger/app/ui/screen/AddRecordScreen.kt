@@ -61,6 +61,7 @@ private val keypadRows = listOf(
 fun AddRecordScreen(
     viewModel: AddRecordViewModel,
     onBackClick: () -> Unit,
+    onSaved: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -70,7 +71,7 @@ fun AddRecordScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "记一笔",
+                        text = uiState.title,
                         fontWeight = FontWeight.SemiBold,
                     )
                 },
@@ -96,11 +97,10 @@ fun AddRecordScreen(
             ) {
                 Button(
                     onClick = {
-                        Toast.makeText(
-                            context,
-                            viewModel.buildSaveSummary(),
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                        viewModel.saveRecord { message ->
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            onSaved()
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -108,7 +108,7 @@ fun AddRecordScreen(
                     shape = MaterialTheme.shapes.medium,
                     contentPadding = PaddingValues(vertical = 14.dp),
                 ) {
-                    Text(text = "保存", style = MaterialTheme.typography.titleMedium)
+                    Text(text = uiState.saveButtonLabel, style = MaterialTheme.typography.titleMedium)
                 }
             }
         },

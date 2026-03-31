@@ -3,6 +3,7 @@
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.Settings
@@ -20,6 +21,9 @@ sealed class AppDestination(
     data object Savings : AppDestination("savings", "存钱", Icons.Outlined.Savings)
     data object Settings : AppDestination("settings", "设置", Icons.Outlined.Settings)
     data object AddRecord : AppDestination("add_record", "记一笔", Icons.Outlined.AddCircle)
+    data object EditRecord : AppDestination("edit_record/{recordId}", "编辑记录", Icons.Outlined.EditNote) {
+        fun createRoute(recordId: Long): String = "edit_record/$recordId"
+    }
 }
 
 val bottomNavDestinations = listOf(

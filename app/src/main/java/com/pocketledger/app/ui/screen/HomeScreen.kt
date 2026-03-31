@@ -54,7 +54,7 @@ fun HomeScreen(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "当前结余",
+                        text = "本月结余",
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White.copy(alpha = 0.92f),
                     )
@@ -63,6 +63,11 @@ fun HomeScreen(
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
+                    )
+                    Text(
+                        text = "预算基线 ${uiState.budgetBaseline}，每月 1 号自动重置，不结转上月超支。",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.76f),
                     )
                 }
 
@@ -105,7 +110,7 @@ fun HomeScreen(
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = "这里后续可以接入近期账单、预算提醒、固定支出和消费趋势分析。当前先保留为高质量骨架页面。",
+                    text = "日常流水账户每月以 2000 元生活费作为预算基线，本月可为负数，超支仅保留在本月历史中。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
