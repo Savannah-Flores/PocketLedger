@@ -1,9 +1,11 @@
 ﻿package com.pocketledger.app.utils
 
 import com.pocketledger.app.data.local.TransactionEntity
+import com.pocketledger.app.ui.calendar.CalendarDayCellUiModel
 import com.pocketledger.app.ui.model.RecordItemUiModel
 import com.pocketledger.app.viewmodel.RecordType
 import java.text.NumberFormat
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -18,6 +20,7 @@ private val currencyFormatter: NumberFormat = NumberFormat.getCurrencyInstance(L
 private val recordTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd HH:mm")
 private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+private val monthTitleFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年M月")
 
 fun TransactionEntity.toRecordItemUiModel(): RecordItemUiModel {
     val recordType = RecordType.fromStorage(type)
@@ -92,4 +95,30 @@ fun timestampToTime(timestamp: Long): String {
         .atZone(ZoneId.systemDefault())
         .toLocalTime()
         .format(timeFormatter)
+}
+
+fun timestampToLocalDate(timestamp: Long): LocalDate {
+    return Instant.ofEpochMilli(timestamp)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+}
+
+fun formatMonthTitle(month: YearMonth): String = month.atDay(1).format(monthTitleFormatter)
+
+fun buildCalendarMonthCells(
+    month: YearMonth,
+    expenseByDate: Map<LocalDate, Double>,
+): List<CalendarDayCellUiModel> {
+    val firstDay = month.atDay(1)
+    val daysFromPreviousMonth = (firstDay.dayOfWeek.value - DayOfWeek.MONDAY.value + 7) % 7
+    val gridStart = firstDay.minusDays(daysFromPreviousMonth.toLong())
+
+    return List(42) { index ->
+        val date = gridStart.plusDays(index.toLong())
+        CalendarDayCellUiModel(
+            date = date,
+            isInCurrentMonth = YearMonth.from(date) == month,
+            expenseTotal = expenseByDate[date] ?: 0.0,
+        )
+    }
 }

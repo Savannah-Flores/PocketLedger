@@ -15,6 +15,7 @@ import com.pocketledger.app.ui.screen.RecordScreen
 import com.pocketledger.app.ui.screen.SavingsScreen
 import com.pocketledger.app.ui.screen.SettingsScreen
 import com.pocketledger.app.viewmodel.AddRecordViewModel
+import com.pocketledger.app.viewmodel.CalendarViewModel
 import com.pocketledger.app.viewmodel.HomeViewModel
 import com.pocketledger.app.viewmodel.RecordViewModel
 
@@ -42,7 +43,8 @@ fun PocketLedgerNavHost(
             )
         }
         composable(AppDestination.Calendar.route) {
-            CalendarScreen()
+            val viewModel: CalendarViewModel = viewModel(factory = CalendarViewModel.Factory)
+            CalendarScreen(viewModel = viewModel)
         }
         composable(AppDestination.Savings.route) {
             SavingsScreen()
