@@ -49,6 +49,7 @@ class AddRecordViewModel(
                         amount = formatAmount(transaction.amount),
                         selectedType = RecordType.fromStorage(transaction.type),
                         category = transaction.category,
+                        isCategoryManual = true,
                         date = timestampToDate(transaction.timestamp),
                         time = timestampToTime(transaction.timestamp),
                         saveButtonLabel = "更新",
@@ -60,9 +61,28 @@ class AddRecordViewModel(
 
     fun updateContent(value: String) {
         _uiState.update { current ->
+            val autoCategory = inferCategory(value)
             current.copy(
                 content = value,
-                category = inferCategory(value),
+                category = if (current.isCategoryManual) current.category else autoCategory,
+            )
+        }
+    }
+
+    fun selectCategory(category: String) {
+        _uiState.update {
+            it.copy(
+                category = category,
+                isCategoryManual = true,
+            )
+        }
+    }
+
+    fun resetCategoryToAuto() {
+        _uiState.update {
+            it.copy(
+                category = inferCategory(it.content),
+                isCategoryManual = false,
             )
         }
     }

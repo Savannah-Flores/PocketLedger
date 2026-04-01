@@ -19,6 +19,7 @@ data class AddRecordUiState(
     val amount: String = "0",
     val selectedType: RecordType = RecordType.Expense,
     val category: String = "其他",
+    val isCategoryManual: Boolean = false,
     val date: String = "2026-04-01",
     val time: String = "08:35",
     val saveButtonLabel: String = "保存",

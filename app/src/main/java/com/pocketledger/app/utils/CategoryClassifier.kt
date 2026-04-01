@@ -1,5 +1,16 @@
 ﻿package com.pocketledger.app.utils
 
+val availableCategories = listOf(
+    "餐饮",
+    "交通",
+    "学习",
+    "娱乐",
+    "医疗",
+    "衣服",
+    "日用品",
+    "其他",
+)
+
 fun inferCategory(content: String): String {
     val text = content.trim()
     if (text.isEmpty()) return "其他"
