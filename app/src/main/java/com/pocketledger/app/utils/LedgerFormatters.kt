@@ -1,8 +1,10 @@
 ﻿package com.pocketledger.app.utils
 
+import com.pocketledger.app.data.local.SavingsDepositEntity
 import com.pocketledger.app.data.local.TransactionEntity
 import com.pocketledger.app.ui.calendar.CalendarDayCellUiModel
 import com.pocketledger.app.ui.model.RecordItemUiModel
+import com.pocketledger.app.ui.model.SavingsEntryUiModel
 import com.pocketledger.app.viewmodel.RecordType
 import java.text.NumberFormat
 import java.time.DayOfWeek
@@ -21,6 +23,7 @@ private val recordTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern
 private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val monthTitleFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年M月")
+private val savingsTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
 fun TransactionEntity.toRecordItemUiModel(): RecordItemUiModel {
     val recordType = RecordType.fromStorage(type)
@@ -35,6 +38,20 @@ fun TransactionEntity.toRecordItemUiModel(): RecordItemUiModel {
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime()
             .format(recordTimeFormatter),
+    )
+}
+
+fun SavingsDepositEntity.toSavingsEntryUiModel(): SavingsEntryUiModel {
+    return SavingsEntryUiModel(
+        id = "manual_$id",
+        title = title,
+        amount = formatCurrency(amount),
+        source = "手动存入",
+        time = Instant.ofEpochMilli(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime()
+            .format(savingsTimeFormatter),
+        sortTimestamp = timestamp,
     )
 }
 
@@ -120,5 +137,36 @@ fun buildCalendarMonthCells(
             isInCurrentMonth = YearMonth.from(date) == month,
             expenseTotal = expenseByDate[date] ?: 0.0,
         )
+    }
+}
+
+fun buildAutoSavingsEntries(transactions: List<TransactionEntity>, currentMonth: YearMonth = YearMonth.now()): List<SavingsEntryUiModel> {
+    val months = transactions
+        .map { timestampToLocalDate(it.timestamp) }
+        .map { YearMonth.from(it) }
+        .distinct()
+        .filter { it.isBefore(currentMonth) }
+
+    return months.mapNotNull { month ->
+        val monthlyBalance = calculateMonthlyBalance(transactions, month)
+        if (monthlyBalance <= 0.0) {
+            null
+        } else {
+            val transferDate = month.plusMonths(1).atDay(1).atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+            SavingsEntryUiModel(
+                id = "auto_${month}",
+                title = "${month.monthValue}月结余转入",
+                amount = formatCurrency(monthlyBalance),
+                source = "系统自动转入",
+                time = Instant.ofEpochMilli(transferDate)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime()
+                    .format(savingsTimeFormatter),
+                sortTimestamp = transferDate,
+            )
+        }
     }
 }

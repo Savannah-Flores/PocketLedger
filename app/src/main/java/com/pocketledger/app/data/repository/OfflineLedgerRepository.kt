@@ -1,13 +1,18 @@
 ﻿package com.pocketledger.app.data.repository
 
+import com.pocketledger.app.data.local.SavingsDepositDao
+import com.pocketledger.app.data.local.SavingsDepositEntity
 import com.pocketledger.app.data.local.TransactionDao
 import com.pocketledger.app.data.local.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
 class OfflineLedgerRepository(
     private val transactionDao: TransactionDao,
+    private val savingsDepositDao: SavingsDepositDao,
 ) : LedgerRepository {
     override fun observeTransactions(): Flow<List<TransactionEntity>> = transactionDao.observeAll()
+
+    override fun observeSavingsDeposits(): Flow<List<SavingsDepositEntity>> = savingsDepositDao.observeAll()
 
     override suspend fun getTransaction(id: Long): TransactionEntity? = transactionDao.getById(id)
 
@@ -21,5 +26,9 @@ class OfflineLedgerRepository(
 
     override suspend fun deleteTransaction(transaction: TransactionEntity) {
         transactionDao.delete(transaction)
+    }
+
+    override suspend fun addSavingsDeposit(deposit: SavingsDepositEntity): Long {
+        return savingsDepositDao.insert(deposit)
     }
 }

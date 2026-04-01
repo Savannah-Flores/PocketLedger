@@ -15,6 +15,9 @@ class DefaultAppContainer(
     private val database = PocketLedgerDatabase.getInstance(context)
 
     override val ledgerRepository: LedgerRepository by lazy {
-        OfflineLedgerRepository(database.transactionDao())
+        OfflineLedgerRepository(
+            transactionDao = database.transactionDao(),
+            savingsDepositDao = database.savingsDepositDao(),
+        )
     }
 }
