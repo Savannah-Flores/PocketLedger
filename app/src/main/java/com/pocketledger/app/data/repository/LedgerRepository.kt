@@ -11,6 +11,8 @@ interface LedgerRepository {
 
     suspend fun getTransaction(id: Long): TransactionEntity?
 
+    suspend fun getSavingsDeposit(id: Long): SavingsDepositEntity?
+
     suspend fun addTransaction(transaction: TransactionEntity): Long
 
     suspend fun updateTransaction(transaction: TransactionEntity)
@@ -18,4 +20,8 @@ interface LedgerRepository {
     suspend fun deleteTransaction(transaction: TransactionEntity)
 
     suspend fun addSavingsDeposit(deposit: SavingsDepositEntity): Long
+
+    suspend fun updateSavingsDeposit(deposit: SavingsDepositEntity)
+
+    suspend fun deleteSavingsDeposit(deposit: SavingsDepositEntity)
 }

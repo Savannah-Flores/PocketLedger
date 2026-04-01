@@ -59,6 +59,31 @@ class SavingsViewModel(
         return true
     }
 
+    fun updateManualDeposit(id: Long, title: String, amount: String): Boolean {
+        val parsedAmount = amount.toDoubleOrNull() ?: return false
+        if (parsedAmount <= 0) return false
+
+        viewModelScope.launch {
+            ledgerRepository.getSavingsDeposit(id)?.let { deposit ->
+                ledgerRepository.updateSavingsDeposit(
+                    deposit.copy(
+                        title = title.ifBlank { "手动存入" },
+                        amount = parsedAmount,
+                    ),
+                )
+            }
+        }
+        return true
+    }
+
+    fun deleteManualDeposit(id: Long) {
+        viewModelScope.launch {
+            ledgerRepository.getSavingsDeposit(id)?.let { deposit ->
+                ledgerRepository.deleteSavingsDeposit(deposit)
+            }
+        }
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

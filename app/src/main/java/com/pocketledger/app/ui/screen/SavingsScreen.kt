@@ -11,9 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,20 +37,29 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pocketledger.app.ui.model.SavingsEntryUiModel
 import com.pocketledger.app.viewmodel.SavingsViewModel
 
+private data class SavingsDialogState(
+    val title: String,
+    val amount: String,
+    val editingId: Long? = null,
+)
+
 @Composable
 fun SavingsScreen(
     viewModel: SavingsViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = androidx.compose.ui.platform.LocalContext.current
-    var showDepositDialog by remember { mutableStateOf(false) }
-    var depositTitle by remember { mutableStateOf("") }
-    var depositAmount by remember { mutableStateOf("") }
+    var dialogState by remember { mutableStateOf<SavingsDialogState?>(null) }
+    var pendingDelete by remember { mutableStateOf<SavingsEntryUiModel?>(null) }
 
-    if (showDepositDialog) {
+    dialogState?.let { state ->
+        var depositTitle by remember(state) { mutableStateOf(state.title) }
+        var depositAmount by remember(state) { mutableStateOf(state.amount) }
+        val isEditing = state.editingId != null
+
         AlertDialog(
-            onDismissRequest = { showDepositDialog = false },
-            title = { Text("手动存入") },
+            onDismissRequest = { dialogState = null },
+            title = { Text(if (isEditing) "修改手动存入" else "手动存入") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
@@ -67,28 +81,51 @@ fun SavingsScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val success = viewModel.addManualDeposit(depositTitle, depositAmount)
+                        val success = if (isEditing) {
+                            viewModel.updateManualDeposit(state.editingId!!, depositTitle, depositAmount)
+                        } else {
+                            viewModel.addManualDeposit(depositTitle, depositAmount)
+                        }
                         if (success) {
-                            Toast.makeText(context, "已存入小荷包", Toast.LENGTH_SHORT).show()
-                            depositTitle = ""
-                            depositAmount = ""
-                            showDepositDialog = false
+                            Toast.makeText(
+                                context,
+                                if (isEditing) "已更新手动存入" else "已存入小荷包",
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                            dialogState = null
                         } else {
                             Toast.makeText(context, "请输入有效的正数金额", Toast.LENGTH_SHORT).show()
                         }
                     },
                 ) {
-                    Text("确认")
+                    Text(if (isEditing) "更新" else "确认")
                 }
             },
             dismissButton = {
+                TextButton(onClick = { dialogState = null }) {
+                    Text("取消")
+                }
+            },
+        )
+    }
+
+    pendingDelete?.let { entry ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text("确认删除") },
+            text = { Text("将删除“${entry.title}”这条手动存入记录，删除后无法恢复。") },
+            confirmButton = {
                 TextButton(
                     onClick = {
-                        depositTitle = ""
-                        depositAmount = ""
-                        showDepositDialog = false
+                        entry.manualDepositId?.let(viewModel::deleteManualDeposit)
+                        pendingDelete = null
                     },
                 ) {
+                    Text("删除")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDelete = null }) {
                     Text("取消")
                 }
             },
@@ -157,7 +194,7 @@ fun SavingsScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Button(onClick = { showDepositDialog = true }) {
+                    Button(onClick = { dialogState = SavingsDialogState(title = "", amount = "") }) {
                         Text("手动存入")
                     }
                 }
@@ -183,14 +220,30 @@ fun SavingsScreen(
             }
         } else {
             items(uiState.entries, key = { it.id }) { entry ->
-                SavingsEntryCard(entry)
+                SavingsEntryCard(
+                    entry = entry,
+                    onEdit = {
+                        entry.manualDepositId?.let {
+                            dialogState = SavingsDialogState(
+                                title = entry.title,
+                                amount = entry.amount.replace("¥", "").replace(",", ""),
+                                editingId = it,
+                            )
+                        }
+                    },
+                    onDelete = { pendingDelete = entry },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun SavingsEntryCard(entry: SavingsEntryUiModel) {
+private fun SavingsEntryCard(
+    entry: SavingsEntryUiModel,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -219,11 +272,26 @@ private fun SavingsEntryCard(entry: SavingsEntryUiModel) {
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
-            Text(
-                text = entry.time,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = entry.time,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (entry.editable) {
+                    Row {
+                        IconButton(onClick = onEdit) {
+                            Icon(Icons.Outlined.Edit, contentDescription = "编辑")
+                        }
+                        IconButton(onClick = onDelete) {
+                            Icon(Icons.Outlined.DeleteOutline, contentDescription = "删除")
+                        }
+                    }
+                }
+            }
         }
     }
 }

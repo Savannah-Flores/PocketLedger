@@ -52,6 +52,8 @@ fun SavingsDepositEntity.toSavingsEntryUiModel(): SavingsEntryUiModel {
             .toLocalDateTime()
             .format(savingsTimeFormatter),
         sortTimestamp = timestamp,
+        editable = true,
+        manualDepositId = id,
     )
 }
 
@@ -166,6 +168,8 @@ fun buildAutoSavingsEntries(transactions: List<TransactionEntity>, currentMonth:
                     .toLocalDateTime()
                     .format(savingsTimeFormatter),
                 sortTimestamp = transferDate,
+                editable = false,
+                manualDepositId = null,
             )
         }
     }
