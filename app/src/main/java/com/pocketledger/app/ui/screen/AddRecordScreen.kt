@@ -1,23 +1,25 @@
 ﻿package com.pocketledger.app.ui.screen
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AccessTime
@@ -58,6 +60,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pocketledger.app.utils.availableCategories
 import com.pocketledger.app.viewmodel.AddRecordViewModel
 import com.pocketledger.app.viewmodel.RecordType
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 private val keypadRows = listOf(
     listOf("1", "2", "3"),
@@ -65,6 +70,9 @@ private val keypadRows = listOf(
     listOf("7", "8", "9"),
     listOf(".", "0", "del"),
 )
+
+private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -78,68 +86,24 @@ fun AddRecordScreen(
     var showCategoryDialog by remember { mutableStateOf(false) }
 
     if (showCategoryDialog) {
-        AlertDialog(
-            onDismissRequest = { showCategoryDialog = false },
-            title = { Text("选择分类") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Text(
-                        text = "你可以保留自动识别，也可以手动改成更准确的分类。",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        availableCategories.forEach { category ->
-                            val selected = uiState.category == category
-                            AssistChip(
-                                onClick = {
-                                    viewModel.selectCategory(category)
-                                    showCategoryDialog = false
-                                },
-                                label = { Text(category) },
-                                colors = if (selected) {
-                                    AssistChipDefaults.assistChipColors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        labelColor = MaterialTheme.colorScheme.onPrimary,
-                                    )
-                                } else {
-                                    AssistChipDefaults.assistChipColors()
-                                },
-                            )
-                        }
-                    }
-                }
+        CategoryPickerDialog(
+            selectedCategory = uiState.category,
+            onCategorySelected = { category ->
+                viewModel.selectCategory(category)
+                showCategoryDialog = false
             },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.resetCategoryToAuto()
-                        showCategoryDialog = false
-                    },
-                ) {
-                    Text("恢复自动")
-                }
+            onResetToAuto = {
+                viewModel.resetCategoryToAuto()
+                showCategoryDialog = false
             },
-            dismissButton = {
-                TextButton(onClick = { showCategoryDialog = false }) {
-                    Text("关闭")
-                }
-            },
+            onDismiss = { showCategoryDialog = false },
         )
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = uiState.title,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
+                title = { Text(text = uiState.title, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     TextButton(onClick = onBackClick) {
                         Icon(
@@ -158,7 +122,7 @@ fun AddRecordScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
             ) {
                 Button(
                     onClick = {
@@ -169,103 +133,125 @@ fun AddRecordScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(52.dp),
                     shape = MaterialTheme.shapes.medium,
-                    contentPadding = PaddingValues(vertical = 14.dp),
                 ) {
                     Text(text = uiState.saveButtonLabel, style = MaterialTheme.typography.titleMedium)
                 }
             }
         },
     ) { innerPadding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            item {
-                AmountHeroCard(amount = uiState.amount)
-            }
-            item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(18.dp),
-                    ) {
-                        OutlinedTextField(
-                            value = uiState.content,
-                            onValueChange = viewModel::updateContent,
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            label = { Text("内容") },
-                            placeholder = { Text("例如“早饭”“地铁”“打印资料”") },
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Sentences,
-                            ),
-                        )
+            AmountHeroCard(
+                amount = uiState.amount,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Text(
-                                text = "类型",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                            RecordTypeSegmentedRow(
-                                selectedType = uiState.selectedType,
-                                onTypeSelected = viewModel::selectType,
-                            )
-                        }
+            CompactInfoPanel(
+                content = uiState.content,
+                selectedType = uiState.selectedType,
+                date = uiState.date,
+                time = uiState.time,
+                category = uiState.category,
+                isCategoryManual = uiState.isCategoryManual,
+                onContentChange = viewModel::updateContent,
+                onTypeSelected = viewModel::selectType,
+                onDateClick = {
+                    showDatePickerDialog(
+                        context = context,
+                        currentDate = uiState.date,
+                        onDateSelected = viewModel::updateDate,
+                    )
+                },
+                onTimeClick = {
+                    showTimePickerDialog(
+                        context = context,
+                        currentTime = uiState.time,
+                        onTimeSelected = viewModel::updateTime,
+                    )
+                },
+                onCategoryClick = { showCategoryDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+            )
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            InfoChipCard(
-                                modifier = Modifier.weight(1f),
-                                icon = {
-                                    Icon(Icons.Rounded.CalendarMonth, contentDescription = null)
-                                },
-                                title = "日期",
-                                value = uiState.date,
-                            )
-                            InfoChipCard(
-                                modifier = Modifier.weight(1f),
-                                icon = {
-                                    Icon(Icons.Rounded.AccessTime, contentDescription = null)
-                                },
-                                title = "时间",
-                                value = uiState.time,
-                            )
-                        }
-
-                        CategoryCard(
-                            category = uiState.category,
-                            isManual = uiState.isCategoryManual,
-                            onClick = { showCategoryDialog = true },
-                        )
-                    }
-                }
-            }
-            item {
-                KeypadCard(
-                    onKeyClick = { key ->
-                        if (key == "del") viewModel.deleteLast() else viewModel.appendNumber(key)
-                    },
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            KeypadCard(
+                onKeyClick = { key ->
+                    if (key == "del") viewModel.deleteLast() else viewModel.appendNumber(key)
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun AmountHeroCard(amount: String) {
+private fun CategoryPickerDialog(
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit,
+    onResetToAuto: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("选择分类") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "可以保留自动识别，也可以手动改成更准确的分类。",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    availableCategories.forEach { category ->
+                        val selected = selectedCategory == category
+                        AssistChip(
+                            onClick = { onCategorySelected(category) },
+                            label = { Text(category) },
+                            colors = if (selected) {
+                                AssistChipDefaults.assistChipColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    labelColor = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            } else {
+                                AssistChipDefaults.assistChipColors()
+                            },
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onResetToAuto) {
+                Text("恢复自动")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("关闭")
+            }
+        },
+    )
+}
+
+@Composable
+private fun AmountHeroCard(
+    amount: String,
+    modifier: Modifier = Modifier,
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         shape = MaterialTheme.shapes.large,
     ) {
         Column(
@@ -278,17 +264,17 @@ private fun AmountHeroCard(amount: String) {
                         ),
                     ),
                 )
-                .padding(horizontal = 24.dp, vertical = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
                 text = "本次金额",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White.copy(alpha = 0.8f),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.78f),
             )
             Text(
                 text = amount,
-                style = MaterialTheme.typography.displayMedium,
+                style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
             )
@@ -296,7 +282,80 @@ private fun AmountHeroCard(amount: String) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CompactInfoPanel(
+    content: String,
+    selectedType: RecordType,
+    date: String,
+    time: String,
+    category: String,
+    isCategoryManual: Boolean,
+    onContentChange: (String) -> Unit,
+    onTypeSelected: (RecordType) -> Unit,
+    onDateClick: () -> Unit,
+    onTimeClick: () -> Unit,
+    onCategoryClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.large,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            OutlinedTextField(
+                value = content,
+                onValueChange = onContentChange,
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                label = { Text("内容") },
+                placeholder = { Text("早饭 / 地铁 / 打印资料") },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                ),
+            )
+
+            RecordTypeSegmentedRow(
+                selectedType = selectedType,
+                onTypeSelected = onTypeSelected,
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                InfoChipCard(
+                    modifier = Modifier.weight(1f),
+                    icon = { Icon(Icons.Rounded.CalendarMonth, contentDescription = null) },
+                    title = "日期",
+                    value = date,
+                    onClick = onDateClick,
+                )
+                InfoChipCard(
+                    modifier = Modifier.weight(1f),
+                    icon = { Icon(Icons.Rounded.AccessTime, contentDescription = null) },
+                    title = "时间",
+                    value = time,
+                    onClick = onTimeClick,
+                )
+            }
+
+            CategoryCompactCard(
+                category = category,
+                isManual = isCategoryManual,
+                onClick = onCategoryClick,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecordTypeSegmentedRow(
     selectedType: RecordType,
@@ -323,37 +382,36 @@ private fun InfoChipCard(
     icon: @Composable () -> Unit,
     title: String,
     value: String,
+    onClick: () -> Unit,
 ) {
     Card(
-        modifier = modifier.clickable { },
+        modifier = modifier.clickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium,
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                icon()
+            icon()
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
         }
     }
 }
 
 @Composable
-private fun CategoryCard(
+private fun CategoryCompactCard(
     category: String,
     isManual: Boolean,
     onClick: () -> Unit,
@@ -367,33 +425,38 @@ private fun CategoryCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
-                    text = if (isManual) "分类结果（已手动修改）" else "自动分类结果",
-                    style = MaterialTheme.typography.labelLarge,
+                    text = if (isManual) "分类（手动）" else "自动分类",
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = category,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
                 )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 Text(
-                    text = if (isManual) "点击重新选择分类，或恢复自动识别" else "点击后可手动修改分类",
+                    text = "修改",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                Icon(
+                    imageVector = Icons.Rounded.KeyboardArrowRight,
+                    contentDescription = "修改分类",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
-            Icon(
-                imageVector = Icons.Rounded.KeyboardArrowRight,
-                contentDescription = "修改分类",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
@@ -401,24 +464,20 @@ private fun CategoryCard(
 @Composable
 private fun KeypadCard(
     onKeyClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         shape = MaterialTheme.shapes.large,
     ) {
         Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(
-                text = "金额输入",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
             keypadRows.forEach { row ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     row.forEach { key ->
                         KeypadButton(
@@ -442,7 +501,7 @@ private fun KeypadButton(
     val isDelete = label == "del"
     Card(
         modifier = modifier
-            .height(68.dp)
+            .height(52.dp)
             .clickable(onClick = onClick),
         shape = CircleShape,
     ) {
@@ -459,13 +518,49 @@ private fun KeypadButton(
             } else {
                 Text(
                     text = label,
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.SemiBold,
                 )
             }
         }
     }
+}
+
+private fun showDatePickerDialog(
+    context: android.content.Context,
+    currentDate: String,
+    onDateSelected: (String) -> Unit,
+) {
+    val parsedDate = runCatching { LocalDate.parse(currentDate, dateFormatter) }.getOrDefault(LocalDate.now())
+    DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+            onDateSelected(selectedDate.format(dateFormatter))
+        },
+        parsedDate.year,
+        parsedDate.monthValue - 1,
+        parsedDate.dayOfMonth,
+    ).show()
+}
+
+private fun showTimePickerDialog(
+    context: android.content.Context,
+    currentTime: String,
+    onTimeSelected: (String) -> Unit,
+) {
+    val parsedTime = runCatching { LocalTime.parse(currentTime, timeFormatter) }.getOrDefault(LocalTime.now())
+    TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            val selectedTime = LocalTime.of(hourOfDay, minute)
+            onTimeSelected(selectedTime.format(timeFormatter))
+        },
+        parsedTime.hour,
+        parsedTime.minute,
+        true,
+    ).show()
 }
 
 

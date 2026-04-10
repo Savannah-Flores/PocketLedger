@@ -69,6 +69,14 @@ class AddRecordViewModel(
         }
     }
 
+    fun updateDate(date: String) {
+        _uiState.update { it.copy(date = date) }
+    }
+
+    fun updateTime(time: String) {
+        _uiState.update { it.copy(time = time) }
+    }
+
     fun selectCategory(category: String) {
         _uiState.update {
             it.copy(
