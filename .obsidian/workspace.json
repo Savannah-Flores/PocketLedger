@@ -210,19 +210,21 @@
   },
   "active": "53591580e863cc7f",
   "lastOpenFiles": [
+    "app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/pocketledger/app/viewmodel/SpendingCategorySummary.dex",
     "app/build/kotlin/compileDebugKotlin/cacheable/dirty-sources.txt",
     "app/build/tmp/kotlin-classes/debug/META-INF/app_debug.kotlin_module",
-    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/ui/screen/ComposableSingletons$AddRecordScreenKt$lambda-5$1.class",
-    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/ui/screen/ComposableSingletons$AddRecordScreenKt$lambda-4$1.class",
-    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/ui/screen/ComposableSingletons$AddRecordScreenKt$lambda-3$1.class",
-    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/ui/screen/ComposableSingletons$AddRecordScreenKt$lambda-2$1.class",
-    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/ui/screen/ComposableSingletons$AddRecordScreenKt$lambda-1$1.class",
-    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/ui/screen/ComposableSingletons$AddRecordScreenKt.class",
-    "app/build/generated/ksp/debug/java/com/pocketledger/app/data/local/PocketLedgerDatabase_Impl.java",
+    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/viewmodel/HomeViewModelKt$buildSpendingDistribution$$inlined$sortedByDescending$1.class",
+    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/viewmodel/HomeViewModelKt.class",
+    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/viewmodel/HomeViewModel$Companion.class",
+    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/ui/screen/ComposableSingletons$HomeScreenKt.class",
+    "app/build/tmp/kotlin-classes/debug/com/pocketledger/app/ui/screen/CategoryVisualStyle.class",
     "app/build/generated/ksp/debug/java/com/pocketledger/app/data/local/TransactionDao_Impl.java",
     "app/build/generated/ksp/debug/java/com/pocketledger/app/data/local/SavingsDepositDao_Impl.java",
-    "14c0967fd42a9aa3a9a071c155eee9c8_720.jpg",
+    "app/build/generated/ksp/debug/java/com/pocketledger/app/data/local/PocketLedgerDatabase_Impl.java",
+    "Pasted image 20260410224229.png",
+    "首页-本月花销分布-原型图.png",
     "Pasted image 20260401081602.png",
-    "codex prompt.md"
+    "codex prompt.md",
+    "14c0967fd42a9aa3a9a071c155eee9c8_720.jpg"
   ]
 }
