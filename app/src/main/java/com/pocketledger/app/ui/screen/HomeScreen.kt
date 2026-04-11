@@ -1,6 +1,7 @@
 ﻿package com.pocketledger.app.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,24 +9,33 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Checkroom
 import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material.icons.outlined.LocalHospital
 import androidx.compose.material.icons.outlined.LocalMall
-import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,12 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pocketledger.app.viewmodel.HomeViewModel
 import com.pocketledger.app.viewmodel.SpendingCategorySummary
+import com.pocketledger.app.viewmodel.SpendingDetailItem
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var selectedCategory by remember { mutableStateOf<SpendingCategorySummary?>(null) }
 
     Column(
         modifier = Modifier
@@ -65,6 +77,17 @@ fun HomeScreen(
 
         MonthlySpendingDistributionCard(
             summaries = uiState.spendingDistribution,
+            onCategoryClick = { summary ->
+                selectedCategory = summary
+            },
+        )
+    }
+
+    selectedCategory?.let { summary ->
+        CategorySpendingDetailSheet(
+            summary = summary,
+            details = uiState.spendingDetailsByCategory[summary.category].orEmpty(),
+            onDismissRequest = { selectedCategory = null },
         )
     }
 }
@@ -126,6 +149,7 @@ private fun MonthlyOverviewCard(
 @Composable
 private fun MonthlySpendingDistributionCard(
     summaries: List<SpendingCategorySummary>,
+    onCategoryClick: (SpendingCategorySummary) -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -152,7 +176,10 @@ private fun MonthlySpendingDistributionCard(
                 )
             } else {
                 summaries.forEach { summary ->
-                    SpendingDistributionItem(summary = summary)
+                    SpendingDistributionItem(
+                        summary = summary,
+                        onClick = { onCategoryClick(summary) },
+                    )
                 }
             }
         }
@@ -162,11 +189,16 @@ private fun MonthlySpendingDistributionCard(
 @Composable
 private fun SpendingDistributionItem(
     summary: SpendingCategorySummary,
+    onClick: () -> Unit,
 ) {
     val style = categoryVisualStyle(summary.category)
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(22.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.Top,
     ) {
@@ -213,6 +245,12 @@ private fun SpendingDistributionItem(
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF2D2D2A),
                 )
+                androidx.compose.material3.Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                    contentDescription = "查看${summary.category}明细",
+                    modifier = Modifier.padding(start = 6.dp),
+                    tint = Color(0xFF8B8B86),
+                )
             }
 
             SpendingProgressBar(
@@ -221,6 +259,121 @@ private fun SpendingDistributionItem(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CategorySpendingDetailSheet(
+    summary: SpendingCategorySummary,
+    details: List<SpendingDetailItem>,
+    onDismissRequest: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        containerColor = Color(0xFFFCFCF8),
+        dragHandle = null,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 22.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(Color(0xFFD5D5CF))
+                    .padding(horizontal = 24.dp, vertical = 3.dp),
+            )
+
+            Text(
+                text = "${summary.category}明细",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF232321),
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "本月截至当前总支出",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF7A7A74),
+                )
+                Text(
+                    text = summary.formattedAmount,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2C226E),
+                )
+            }
+
+            if (details.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 36.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "本月暂无该分类支出记录",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color(0xFF7A7A74),
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    items(
+                        items = details,
+                        key = { it.id },
+                    ) { detail ->
+                        SpendingDetailRow(detail = detail)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SpendingDetailRow(
+    detail: SpendingDetailItem,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = detail.content,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF252523),
+            )
+            Text(
+                text = "${detail.date} ${detail.time}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF7A7A74),
+            )
+        }
+        Text(
+            text = detail.formattedAmount,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF2C226E),
+        )
+    }
+
+    HorizontalDivider(color = Color(0xFFE4E4DE))
 }
 
 @Composable
@@ -252,13 +405,13 @@ private data class CategoryVisualStyle(
 
 private fun categoryVisualStyle(category: String): CategoryVisualStyle {
     return when (category) {
-        "餐饮" -> CategoryVisualStyle(Icons.Outlined.Restaurant, Color(0xFF5C48C8))
-        "学习" -> CategoryVisualStyle(Icons.Outlined.MenuBook, Color(0xFF5C9EC7))
-        "交通" -> CategoryVisualStyle(Icons.Outlined.DirectionsBus, Color(0xFF3AA5A5))
-        "娱乐" -> CategoryVisualStyle(Icons.Outlined.SportsEsports, Color(0xFF8A78C8))
-        "医疗" -> CategoryVisualStyle(Icons.Outlined.LocalHospital, Color(0xFF6FA6B8))
-        "衣服" -> CategoryVisualStyle(Icons.Outlined.Checkroom, Color(0xFF9E8FB4))
-        "日用品" -> CategoryVisualStyle(Icons.Outlined.LocalMall, Color(0xFF7C9A87))
+        "\u9910\u996E" -> CategoryVisualStyle(Icons.Outlined.Restaurant, Color(0xFF5C48C8))
+        "\u5B66\u4E60" -> CategoryVisualStyle(Icons.AutoMirrored.Outlined.MenuBook, Color(0xFF5C9EC7))
+        "\u4EA4\u901A" -> CategoryVisualStyle(Icons.Outlined.DirectionsBus, Color(0xFF3AA5A5))
+        "\u5A31\u4E50" -> CategoryVisualStyle(Icons.Outlined.SportsEsports, Color(0xFF8A78C8))
+        "\u533B\u7597" -> CategoryVisualStyle(Icons.Outlined.LocalHospital, Color(0xFF6FA6B8))
+        "\u8863\u670D" -> CategoryVisualStyle(Icons.Outlined.Checkroom, Color(0xFF9E8FB4))
+        "\u65E5\u7528\u54C1" -> CategoryVisualStyle(Icons.Outlined.LocalMall, Color(0xFF7C9A87))
         else -> CategoryVisualStyle(Icons.Outlined.MoreHoriz, Color(0xFF6F7168))
     }
 }
